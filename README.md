@@ -1,4 +1,5 @@
 # BuddyBot: Your Friendly Helper, Just a Chat Away!
+![image](https://github.com/user-attachments/assets/4deb4470-65da-4772-900d-79c8bcc2fb18)
 
 ## Project Overview
 
