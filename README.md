@@ -20,6 +20,7 @@ BuddyBot is an AI-powered chatbot designed to assist students in their learning 
 - **Back-End Framework:** Flask
 - **AI Model:** Integration of Google Gemini for generating responses.
 
+
 ## Installation
 
 1. Clone the Repository - Use the command:
