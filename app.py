@@ -5,12 +5,7 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
-# Load the API key from environment variables
-GEMINI_API_KEY = os.getenv("API_KEY")
-
-if GEMINI_API_KEY is None:
-    raise ValueError("API key not found. Please set the GEMINI_API_KEY environment variable.")
-
+GEMINI_API_KEY = "AIzaSyBm0Ajs-y1nLXoJ3y3PQF64i2OC8LO3pUU"
 genai.configure(api_key=GEMINI_API_KEY)
 
 generation_config = {
@@ -47,7 +42,7 @@ def send_message():
             return jsonify({"response": response})
 
     chat_session = model.start_chat(history=[])
-
+    
     prompt = f"You are BuddyBot, an empathetic AI assistant for students. Respond to the following message in a supportive, encouraging, and student-friendly manner: {user_message}"
     
     response = chat_session.send_message(prompt)
