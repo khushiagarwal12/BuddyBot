@@ -5,7 +5,12 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
-GEMINI_API_KEY = "AIzaSyBm0Ajs-y1nLXoJ3y3PQF64i2OC8LO3pUU"
+# Get the API key from the environment variable
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+if GEMINI_API_KEY is None:
+    raise ValueError("GEMINI_API_KEY is not set in the environment")
+
 genai.configure(api_key=GEMINI_API_KEY)
 
 generation_config = {
@@ -59,4 +64,8 @@ def send_message():
     return jsonify({"response": bot_response})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Get the PORT from the environment variable (use 5000 as a fallback)
+    port = int(os.environ.get('PORT', 5000))
+
+    # Run the app on the host '0.0.0.0' to make it publicly accessible
+    app.run(host='0.0.0.0', port=port, debug=True)
