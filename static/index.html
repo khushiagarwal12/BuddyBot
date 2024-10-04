@@ -1,236 +1,236 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BuddyBot Chat</title>
-    <style>
-        /* Body styling */
-        body {
-            font-family: 'Arial', sans-serif;
-            background-image: url('/static/background.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        /* Chat container styling with new outline */
-        .chat-container {
-            width: 80%; /* Increased from 350px to 80% of viewport width */
-            max-width: 800px; /* Added max-width to prevent it from becoming too wide on large screens */
-            height: 80vh; /* Set height to 80% of viewport height */
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            z-index: 10;
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BuddyBot Chat</title>
+        <style>
+            /* Body styling */
+            body {
+                font-family: 'Arial', sans-serif;
+                background-image: url('/static/background.jpg');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                overflow: hidden;
+                position: relative;
+            }
             
-            /* New outline styling */
-            border: 4px solid transparent;
-            background-clip: padding-box;
-        }
-        
-        /* Pseudo-element for the gradient border */
-        .chat-container::before {
-            content: '';
-            position: absolute;
-            top: -4px; right: -4px; bottom: -4px; left: -4px;
-            background: linear-gradient(45deg, #ff69b4, #1e90ff);
-            border-radius: 19px; /* 15px + 4px for the border */
-            z-index: -1;
-        }
-        
-        /* Chat window styling */
-        .chat-window {
-            height: calc(100% - 100px); /* Adjust height to fill container, leaving space for header and input */
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 10px;
-            background-color: #f0f8ff;
-            flex-grow: 1;
-        }
-        
-        /* Individual message styling */
-        .user-message, .bot-message {
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 10px;
-            max-width: 80%;
-        }
-
-        .user-message {
-            text-align: right;
-            color: #007bff;
-            margin-left: auto;
-            background-color: #e3f2fd;
-        }
-        
-        .bot-message {
-            text-align: left;
-            color: #333;
-            margin-right: auto;
-            background-color: #f0f0f0;
-        }
-        
-        /* Input field styling */
-        input[type="text"] {
-            width: calc(100% - 100px); /* Adjust width to leave space for the button */
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-right: 10px;
-            font-size: 16px;
-        }
-        
-        /* Button styling */
-        button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        /* Bubbles container */
-        #bubbles-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* Bubble styling */
-        .bubble {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
-            box-shadow: inset -5px -5px 5px rgba(0, 0, 0, 0.1),
-                        inset 5px 5px 5px rgba(255, 255, 255, 0.5);
-        }
-
-        @keyframes float-left-to-right {
-            from {
-                transform: translateX(-100%);
-            }
-            to {
-                transform: translateX(100vw);
-            }
-        }
-
-        @keyframes float-right-to-left {
-            from {
-                transform: translateX(100vw);
-            }
-            to {
-                transform: translateX(-100%);
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Bubbles container -->
-    <div id="bubbles-container"></div>
-
-    <div class="chat-container">
-        <h2 style="text-align: center; color: #eef3f8; margin-bottom: 20px;">BuddyBot - Your Friendly Buddy!</h2>
-        <div class="chat-window" id="chatWindow">
-            <!-- Chat messages will appear here -->
-        </div>
-        <div style="display: flex; margin-top: 10px;">
-            <input type="text" id="messageInput" placeholder="Type your message here..." />
-            <button onclick="sendMessage()">Send</button>
-        </div>
-    </div>
-
-    <script>
-        function sendMessage() {
-            const userMessage = document.getElementById("messageInput").value;
-            if (userMessage.trim() === "") return; // Prevent sending empty messages
-
-            // Append user message to chat window
-            const chatWindow = document.getElementById("chatWindow");
-            chatWindow.innerHTML += `<div class="user-message"><strong>You:</strong> ${userMessage}</div>`;
-            document.getElementById("messageInput").value = ""; // Clear input field
-
-            // Send the message to the server
-            fetch('/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: userMessage }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Append bot response to chat window
-                chatWindow.innerHTML += `<div class="bot-message"><strong>BuddyBot:</strong> ${data.response}</div>`;
-                chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
-        // Listen for Enter key to send message
-        document.getElementById("messageInput").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault(); // Prevent the default action
-                sendMessage(); // Call the sendMessage function
-            }
-        });
-
-        // Create bubbles
-        function createBubbles() {
-            const bubblesContainer = document.getElementById('bubbles-container');
-            const bubbleCount = 15; // Adjust this number to create more or fewer bubbles
-
-            for (let i = 0; i < bubbleCount; i++) {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
+            /* Chat container styling with new outline */
+            .chat-container {
+                width: 80%; /* Increased from 350px to 80% of viewport width */
+                max-width: 800px; /* Added max-width to prevent it from becoming too wide on large screens */
+                height: 80vh; /* Set height to 80% of viewport height */
+                padding: 20px;
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 15px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+                display: flex;
+                flex-direction: column;
+                position: relative;
+                z-index: 10;
                 
-                const size = Math.random() * 100 + 50; // Random size between 50px and 150px
-                bubble.style.width = `${size}px`;
-                bubble.style.height = `${size}px`;
-                
-                const topPosition = Math.random() * 100; // Random vertical position
-                bubble.style.top = `${topPosition}vh`;
-                
-                const duration = Math.random() * 20 + 10; // Random duration between 10s and 30s
-                const delay = Math.random() * -30; // Random delay to stagger animations
-                
-                if (Math.random() > 0.5) {
-                    bubble.style.animation = `float-left-to-right ${duration}s linear ${delay}s infinite`;
-                } else {
-                    bubble.style.animation = `float-right-to-left ${duration}s linear ${delay}s infinite`;
+                /* New outline styling */
+                border: 4px solid transparent;
+                background-clip: padding-box;
+            }
+            
+            /* Pseudo-element for the gradient border */
+            .chat-container::before {
+                content: '';
+                position: absolute;
+                top: -4px; right: -4px; bottom: -4px; left: -4px;
+                background: linear-gradient(45deg, #ff69b4, #1e90ff);
+                border-radius: 19px; /* 15px + 4px for the border */
+                z-index: -1;
+            }
+            
+            /* Chat window styling */
+            .chat-window {
+                height: calc(100% - 100px); /* Adjust height to fill container, leaving space for header and input */
+                overflow-y: auto;
+                border: 1px solid #ccc;
+                margin-bottom: 10px;
+                padding: 10px;
+                border-radius: 10px;
+                background-color: #f0f8ff;
+                flex-grow: 1;
+            }
+            
+            /* Individual message styling */
+            .user-message, .bot-message {
+                margin: 10px 0;
+                padding: 10px;
+                border-radius: 10px;
+                max-width: 80%;
+            }
+
+            .user-message {
+                text-align: right;
+                color: #007bff;
+                margin-left: auto;
+                background-color: #e3f2fd;
+            }
+            
+            .bot-message {
+                text-align: left;
+                color: #333;
+                margin-right: auto;
+                background-color: #f0f0f0;
+            }
+            
+            /* Input field styling */
+            input[type="text"] {
+                width: calc(100% - 100px); /* Adjust width to leave space for the button */
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                margin-right: 10px;
+                font-size: 16px;
+            }
+            
+            /* Button styling */
+            button {
+                padding: 10px 15px;
+                border: none;
+                border-radius: 5px;
+                background-color: #007bff;
+                color: white;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+            
+            button:hover {
+                background-color: #0056b3;
+            }
+
+            /* Bubbles container */
+            #bubbles-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            /* Bubble styling */
+            .bubble {
+                position: absolute;
+                border-radius: 50%;
+                background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
+                box-shadow: inset -5px -5px 5px rgba(0, 0, 0, 0.1),
+                            inset 5px 5px 5px rgba(255, 255, 255, 0.5);
+            }
+
+            @keyframes float-left-to-right {
+                from {
+                    transform: translateX(-100%);
                 }
-                
-                bubblesContainer.appendChild(bubble);
+                to {
+                    transform: translateX(100vw);
+                }
             }
-        }
 
-        // Call createBubbles when the page loads
-        window.onload = createBubbles;
-    </script>
-</body>
-</html>
+            @keyframes float-right-to-left {
+                from {
+                    transform: translateX(100vw);
+                }
+                to {
+                    transform: translateX(-100%);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Bubbles container -->
+        <div id="bubbles-container"></div>
+
+        <div class="chat-container">
+            <h2 style="text-align: center; color: #eef3f8; margin-bottom: 20px;">BuddyBot - Your Friendly Buddy!</h2>
+            <div class="chat-window" id="chatWindow">
+                <!-- Chat messages will appear here -->
+            </div>
+            <div style="display: flex; margin-top: 10px;">
+                <input type="text" id="messageInput" placeholder="Type your message here..." />
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <script>
+            function sendMessage() {
+                const userMessage = document.getElementById("messageInput").value;
+                if (userMessage.trim() === "") return; // Prevent sending empty messages
+
+                // Append user message to chat window
+                const chatWindow = document.getElementById("chatWindow");
+                chatWindow.innerHTML += `<div class="user-message"><strong>You:</strong> ${userMessage}</div>`;
+                document.getElementById("messageInput").value = ""; // Clear input field
+
+                // Send the message to the server
+                fetch('/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: userMessage }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Append bot response to chat window
+                    chatWindow.innerHTML += `<div class="bot-message"><strong>BuddyBot:</strong> ${data.response}</div>`;
+                    chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
+                })
+                .catch(error => console.error('Error:', error));
+            }
+
+            // Listen for Enter key to send message
+            document.getElementById("messageInput").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault(); // Prevent the default action
+                    sendMessage(); // Call the sendMessage function
+                }
+            });
+
+            // Create bubbles
+            function createBubbles() {
+                const bubblesContainer = document.getElementById('bubbles-container');
+                const bubbleCount = 15; // Adjust this number to create more or fewer bubbles
+
+                for (let i = 0; i < bubbleCount; i++) {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble';
+                    
+                    const size = Math.random() * 100 + 50; // Random size between 50px and 150px
+                    bubble.style.width = `${size}px`;
+                    bubble.style.height = `${size}px`;
+                    
+                    const topPosition = Math.random() * 100; // Random vertical position
+                    bubble.style.top = `${topPosition}vh`;
+                    
+                    const duration = Math.random() * 20 + 10; // Random duration between 10s and 30s
+                    const delay = Math.random() * -30; // Random delay to stagger animations
+                    
+                    if (Math.random() > 0.5) {
+                        bubble.style.animation = `float-left-to-right ${duration}s linear ${delay}s infinite`;
+                    } else {
+                        bubble.style.animation = `float-right-to-left ${duration}s linear ${delay}s infinite`;
+                    }
+                    
+                    bubblesContainer.appendChild(bubble);
+                }
+            }
+
+            // Call createBubbles when the page loads
+            window.onload = createBubbles;
+        </script>
+    </body>
+    </html>
