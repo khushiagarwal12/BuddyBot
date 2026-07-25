@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
 import os
 import random
-import google.generativeai as genai
+from google import genai
 
 app = Flask(__name__)
 
@@ -11,19 +11,9 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if GEMINI_API_KEY is None:
     raise ValueError("GEMINI_API_KEY is not set in the environment")
 
-genai.configure(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY)
 
-generation_config = {
-    "temperature": 0.7,
-    "top_p": 0.95,
-    "top_k": 40,
-    "max_output_tokens": 8192,
-}
-
-model = genai.GenerativeModel(
-    model_name="gemini-2.5-flash",
-    generation_config=generation_config,
-)
+MODEL_NAME = "gemini-3.5-flash"
 
 @app.route('/')
 def index():
@@ -32,7 +22,7 @@ def index():
 @app.route('/send', methods=['POST'])
 def send_message():
     user_message = request.json.get('message')
-    
+
     empathetic_responses = {
         "stress": "I understand that stress can be overwhelming. Remember to take deep breaths and focus on what you can control. You're doing great!",
         "exam": "Exams can be nerve-wracking, but I believe in you! Remember to take breaks and be kind to yourself during your study sessions.",
@@ -46,13 +36,20 @@ def send_message():
         if keyword in user_message.lower():
             return jsonify({"response": response})
 
-    chat_session = model.start_chat(history=[])
-    
     prompt = f"You are BuddyBot, an empathetic AI assistant for students. Respond to the following message in a supportive, encouraging, and student-friendly manner: {user_message}"
-    
-    response = chat_session.send_message(prompt)
+
+    response = client.models.generate_content(
+        model=MODEL_NAME,
+        contents=prompt,
+        config={
+            "temperature": 0.7,
+            "top_p": 0.95,
+            "top_k": 40,
+            "max_output_tokens": 8192,
+        },
+    )
     bot_response = response.text
-    
+
     supportive_closings = [
         "Remember, I'm always here to listen and support you!",
         "You're doing great, and I believe in you!",
