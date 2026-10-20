@@ -4,7 +4,7 @@
 ## Project Overview
 BuddyBot is an AI-powered chatbot designed to support student mental health, an area that is often under-resourced and overlooked. Available around the clock, BuddyBot provides a non-judgmental space for students to seek help whenever they need it. By integrating Gemini's advanced natural language processing capabilities, the chatbot can detect emotional tones in conversations and respond with genuine empathy.
 
-## Live Demonstration Link: https://replit.com/@khushi3agarwal/BuddyBot
+## Live Demonstration Link: [https://replit.com/@khushi3agarwal/BuddyBot](https://buddybot-sooty.vercel.app/)
 
 ## Key Features
 
